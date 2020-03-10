@@ -1,0 +1,55 @@
+{
+    "frontends": {
+      "frontend2": {
+        "routes": {
+          "test_2": {
+            "rule": "Path:/test"
+          }
+        },
+        "backend": "backend1"
+      },
+      "frontend1": {
+        "routes": {
+          "test_1": {
+            "rule": "Host:test.localhost"
+          }
+        },
+        "backend": "backend2"
+      }
+    },
+    "backends": {
+      "backend2": {
+        "loadBalancer": {
+          "method": "drr"
+        },
+        "servers": {
+          "server2": {
+            "weight": 2,
+            "URL": "http://172.17.0.5:80"
+          },
+          "server1": {
+            "weight": 1,
+            "url": "http://172.17.0.4:80"
+          }
+        }
+      },
+      "backend1": {
+        "loadBalancer": {
+          "method": "wrr"
+        },
+        "circuitBreaker": {
+          "expression": "NetworkErrorRatio() > 0.5"
+        },
+        "servers": {
+          "server2": {
+            "weight": 1,
+            "url": "http://172.17.0.3:80"
+          },
+          "server1": {
+            "weight": 10,
+            "url": "http://172.17.0.2:80"
+          }
+        }
+      }
+    }
+}
