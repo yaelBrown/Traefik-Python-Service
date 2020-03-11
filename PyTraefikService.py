@@ -66,14 +66,14 @@ class PyTraefikService:
     """
     Returns a SINGLE dictionary of config used for Traefik
         FE_Path = '/{range_id}/{operator_id}'
-            Must include leading '/', ex.: '/1/1' 
+            Must include leading '/', ex.: '/1/1'
         BE_Path = 'https://demo.glyptodon.com/#/client/ZGVtbwBjAGRlbW8='
             Full address to guacamole machine
     """
     def addSingleConfig(FE_Path="", BE_Path="", pathCnt=1):
         if FE_Path[0] != "/":
             FE_Path = "".join(("/", FE_Path))
-        
+
         config = {
             "frontends": {
                 "FE_Operator_Path": {
@@ -88,7 +88,9 @@ class PyTraefikService:
             "backends": {
                 f"backend_{pathCnt}": {
                     "servers": {
-                        f"server_{pathCnt}": BE_Path
+                        "server1": {
+                            f"url": BE_Path
+                        }
                     }
                 }
             }
@@ -124,19 +126,21 @@ class PyTraefikService:
         elif addOrRem == None or type(addOrRem) != bool:
             print("addOrRem must be a present and a boolean")
             return "addOrRem must be a present and a boolean"
-        print("is this going to work?")
-        cfg = json.dumps(PyTraefikService.readExampleFile())
+        cfg = json.dumps(cfg)
+        # cfg = json.loads(cfg)
+        # print(type(cfg))
         print(cfg)
-        if addOrRem == True: 
-            res = requests.put(url, data = cfg, headers={'Content-Type': 'application/json'})
+        if addOrRem == True:
+            headers = {'Content-Type': 'application/json'}
+            res = requests.request("PUT", url, headers = headers, data = cfg)
             if res.status_code == 200:
                 print("Successfully added data to Traefik!")
                 return "Successfully added data to Traefik!"
             else:
                 print(f"Unable to add to Traefik: {res.status_code}")
                 return f"Unable to add to Traefik: {res.status_code}"
-        else: 
-            res = requests.delete(url, data = cfg)
+        else:
+            # res = requests.delete(url, data = cfg)
             if res.status_code == 200:
                 print("Successfully deleted data from Traefik!")
                 return "Successfully deleted data from Traefik!"
@@ -145,9 +149,8 @@ class PyTraefikService:
                 return f"Unable to add to Traefik: {res.status_code}"
 
 # test above methods
-aa = [1,3,4,5]
 
-# print(PyTraefikService.addMultipleConfigs("aa"))
+aa = [1,3,4,5]
 
 bb = [
     {
@@ -171,8 +174,8 @@ be = "http://www.amazon.com"
 # print(PyTraefikService.addSingleConfig("/2/1", "http://www.stackoverflow.com"))
 # print(PyTraefikService.addMultipleConfigs(bb))
 # PyTraefikService.putToTraefik(PyTraefikService.addMultipleConfigs(bb), True)
-# PyTraefikService.putToTraefik(PyTraefikService.addSingleConfig(fe, be), True)
-PyTraefikService.putToTraefik(json.dumps(PyTraefikService.example), True)
+PyTraefikService.putToTraefik(PyTraefikService.addSingleConfig(fe, be), True)
+# PyTraefikService.putToTraefik(json.dumps(PyTraefikService.example), True)
 
 
 # PyTraefikService.addSingleConfig(fe, be)
